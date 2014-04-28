@@ -1,38 +1,44 @@
 package WWW::Sina::Weibo;
 
-use 5.018000;
 use strict;
 use warnings;
-
-require Exporter;
-
-our @ISA = qw(Exporter);
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use WWW::Sina::Weibo ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-	
-);
+use utf8;
+use Moose;
+use DateTime;
+use Mojo::UserAgent;
+use Data::Dumper;
 
 our $VERSION = '0.01';
 
+with 'WWW::Sina::Weibo::OAuth', 'WWW::Sina::Weibo::ShortURL', 'WWW::Sina::Weibo::Status', 'WWW::Sina::Weibo::Emotions';
 
-# Preloaded methods go here.
+has appkey           => ( is => 'ro', isa => 'Str',             required => 1 );
+has appsecret        => ( is => 'ro', isa => 'Str',             required => 1 );
+has authorize_uri    => ( is => 'ro', isa => 'Str',             default  => '' );
+has access_token_uri => ( is => 'ro', isa => 'Str',             default  => '' );
+has redirect_uri     => ( is => 'ro', isa => 'Str',             default  => '' );
+has access_token     => ( is => 'rw', isa => 'Str',             default  => '' );
+has ua               => ( is => 'ro', isa => 'Mojo::UserAgent', lazy     => 1, default => sub { Mojo::UserAgent->new } );
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    if ( @_ == 0 ) {
+        my $config = {};
+        return $class->$orig(
+            appkey           => $config->{appkey},
+            appsecret        => $config->{appsecret},
+            authorize_uri    => $config->{authorize_uri},
+            access_token_uri => $config->{access_token_uri},
+            redirect_uri     => $config->{auth_redirect_uri},
+        );
+    }
+    else {
+        return $class->$orig(@_);
+    }
+};
 
 1;
-__END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
