@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-Sina-Weibo.t
+lib/WWW/Sina/Weibo.pm
